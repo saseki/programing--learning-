@@ -1,0 +1,95 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+ 
+108. Convert Sorted Array to Binary Search Tree Add to List
+DescriptionHintsSubmissionsSolutions
+Total Accepted: 120377
+Total Submissions: 290083
+Difficulty: Easy
+Contributor: LeetCode
+Given an array where elements are sorted in ascending order, convert it to a height balanced BST.
+
+class Solution {
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return solve(nums,0,nums.size()-1);
+    } 
+    private:
+    //递归求解    利用nums[start....end]来构建二叉树  并返回构建之后树的根 
+    TreeNode* solve(vector<int> & nums,int start,int end)
+    {
+        if(start>end)//递归终止  当要给的序列段为空时返回NULL
+        return NULL;
+        int mid=start+(end-start)/2; //将中点设置为根
+        TreeNode* head=new TreeNode(nums[mid]);
+        head->left=solve(nums,start,mid-1);//左边序列的构建一棵搜索树成为根的左孩子
+        head->right=solve(nums,mid+1,end);//右边序列构建一颗搜索树 成为根的右孩子
+        return head;
+    }
+};
+109. Convert Sorted List to Binary Search Tree Add to List
+DescriptionHintsSubmissionsSolutions
+Total Accepted: 102665
+Total Submissions: 306920
+Difficulty: Medium
+Contributor: LeetCode
+Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
+
+class Solution {
+public:
+    // 和上题思路一样  但难点是如何在单链表中找到中点 并且进入下一个递归
+    //递归一定要先想明白   递归函数的定义（函数形参和返回值的具体意义 已经该函数做了什么事情）
+    TreeNode* sortedListToBST(ListNode* head) {
+       vector<int> res;
+       ListNode* cur=head;
+        while(cur)
+        {
+            res.push_back(cur->val);
+            cur=cur->next;
+        }
+        return solve(res,0,res.size()-1);//将链表数据读出来 放入vector 变成上面一个题的思路
+    }
+    private: 
+    TreeNode* solve(vector<int> & nums,int start,int end)
+    {
+        if(start>end)
+        return NULL;
+        int mid=start+(end-start)/2;
+        TreeNode* head=new TreeNode(nums[mid]);
+        head->left=solve(nums,start,mid-1);
+        head->right=solve(nums,mid+1,end);
+        return head;
+    }
+};
+
+
+//java 这是用快慢指针 找到中点的做法 递归定义 ：利用head单链表构建搜索树并返回该树的头结点
+public TreeNode sortedListToBST(ListNode head) {
+    if(head == null)
+        return null;//递归终止  用来构建二叉树的链表为空 构建的数也是空的
+    ListNode fast = head;
+    ListNode slow = head;
+    ListNode prev =null; 
+    while(fast != null && fast.next != null)
+    {
+        fast = fast.next.next;
+        prev =slow;//prev放slow的前一个
+        slow=slow.next;
+    }//循环结束 fast指向null pre指向中间节点的前一个 slow指向中间节点当只有一个节点时pre指向null
+    TreeNode root = new TreeNode(slow.val);
+    if(prev != null)//当左边链表不为空时 只保留左半边
+        prev.next = null;
+    else
+        head  = null;//左边链表没有了就把左边链表设置为空
+        
+    root.left = sortedListToBST(head);//左右递归
+    root.right = sortedListToBST(slow.next);
+    return root;
+}
