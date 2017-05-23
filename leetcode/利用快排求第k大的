@@ -1,0 +1,153 @@
+//对arr[l...r]进行快速排序 快速排序模板如此    针对快排的优化基本是 对partition的优化
+template<typename T>
+void __quickSort(T arr[], int l, int r)
+{
+	if (l >= r)
+		return;
+	int p = __patition(arr, l, r);
+	__quickSort(arr, l, p - 1);
+	__quickSort(arr, p + 1, r);
+}
+//对arr[l...r]进行patition操作
+
+template<typename T>
+//单路快排：//返回一个int p,使arr[l...p-1]都小于arr[p],使arr[p+1...r]都大于等于arr[p]
+int __patition(T arr[], int l, int r)
+{
+	T v = arr[l];
+	// arr[l+1...j]<v,arr[j+1...i)>=v
+	int j = l;//注意初始值的设定 正好使得 初始这两个数组为空
+	for (int i = l + 1;i <= r;i++)
+	{
+		if (arr[i] < v)
+		{
+			swap(arr[j + 1], arr[i]);
+			j++;
+		}
+	}
+	swap(arr[j], arr[l]);
+	return j;
+}
+//单链表快排 不方便用双路和三路  用单路的比较方便
+//双路patition
+int __patition2(T arr[], int l, int r)
+{
+	//随机进行挑选标记元素，并将其调换到数组的第一个元素，后面操作与基本快排相同
+	srand(time(NULL));
+	swap(arr[rand() % (r - l + 1) + l], arr[l]);
+
+	T v = arr[l];
+	// arr[l+1...i)<= v,arr(j...r]>=v 注意数组含义 以及初值的选取让数组开始为空
+	int j = r;
+	int i = l + 1;
+	while (true)
+	{
+		while (i <= r && arr[i] < v)i++;
+		while (j >= l + 1 && arr[j] > v)j--;
+		if (i > j)break;
+		swap(arr[i], arr[j]);
+		i++;
+		j--;
+	}
+	swap(arr[l], arr[j]);
+	return j;
+}
+-----------------------//三路快排
+void __quickSort3Ways(T arr[], int l, int r)
+{
+	if (l >= r)
+		return;
+	//patition 操作
+
+	//随机进行挑选标记元素，并将其调换到数组的第一个元素，后面操作与基本快排相同
+	srand(time(NULL));
+	swap(arr[rand() % (r - l + 1) + l], arr[l]);
+
+	T v = arr[l];
+
+	int lt = l;//arr[l+1,lt]<v
+	int gt = r + 1;//arr[gt,r]>v
+	int i = l + 1;//arr[lt+1,i) == v
+	while (i < gt)
+	{
+		if (arr[i] < v)
+		{
+			swap(arr[i], arr[lt + 1]);
+			lt++;
+			i++;
+		}
+		else if (arr[i] > v)
+		{
+			swap(arr[i], arr[gt - 1]);
+			gt--;
+		}
+		else//arr[i] == v
+		{
+			i++;
+		}
+	}
+	swap(arr[l], arr[lt]);
+
+	__quickSort3Ways(arr, l, lt - 1);
+	__quickSort3Ways(arr, gt, r);
+}
+//
+215. Kth Largest Element in an Array Add to List
+DescriptionHintsSubmissionsSolutions
+Total Accepted: 127419
+Total Submissions: 330410
+Difficulty: Medium
+Contributor: LeetCode
+Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+For example,
+Given [3,2,1,5,6,4] and k = 2, return 5.
+
+Note: 
+You may assume k is always valid, 1 ≤ k ≤ array's length.
+//利用快排的思想 来找第k大的  二路快排 每次partition 都把枢纽放在正确的位置
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        int start=0;//
+        int end=nums.size()-1; 
+        int temp=partition(nums,start,end);//在start和end中间 尝试返回枢纽的位置   
+        while(temp!=nums.size()-k)//返回位置索引是 nums.size()-k时 该位置就是第k大的数
+        {
+            if(temp>nums.size()-k)//已经确定的位置 在第k大的右边 在左边一段找索引为 nums.size()-k的
+            {
+                end=temp-1;
+                temp=partition(nums,start,end);
+            }
+            else//已经确定的位置 在第k大的左边 在右边的一段找 索引 为nums.size()-k的
+            {
+                start=temp+1;
+                temp=partition(nums,start,end);
+            }
+        }
+        return nums[temp];
+    }
+    private:
+    //对nums[l....r]进行一次partition操作 返回枢纽在vector中的索引
+    int partition(vector<int>&nums,int l,int r)
+    {
+        //swap(nums[l],nums[rand()%(r-l+1)]);
+        int piviot=nums[l];//随机取得枢纽值 放到该段的起始位置  
+        int i=l+1;//nums[L+1.....i) <=piviot
+        int j=r;//nums(j......r]>=piviot
+        while(1)
+        {
+            while(i<=r&&nums[i]<piviot)
+            i++;
+            while(j>=l+1&&nums[j]>piviot)
+            j--;
+            if(i>j)
+            break;
+            swap(nums[i],nums[j]);
+            i++;
+            j--;
+        }
+        swap(nums[l],nums[j]);//将nums【l】放到正确的位置上
+        return j;
+    }
+};
