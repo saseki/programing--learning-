@@ -29,6 +29,7 @@ int __patition(T arr[], int l, int r)
 	return j;
 }
 //单链表快排 不方便用双路和三路  用单路的比较方便
+[这里是单链表快排的一个题目链接注意与数组一路排序的区别](https://leetcode.com/problems/sort-list/#/description)
 //双路patition
 int __patition2(T arr[], int l, int r)
 {
